@@ -13,6 +13,7 @@ export class MachineSaleSubscriber implements ISubscriber {
     handle(event: IEvent): void {
         if (event instanceof MachineSaleEvent) {
             const machine = this.machines.find((m) => m.id === event.machineId());
+
             if (machine) {
                 machine.stockLevel -= event.getSoldQuantity();
                 console.log(`Machine ${machine.id} sold ${event.getSoldQuantity()}. New stock: ${machine.stockLevel}`);

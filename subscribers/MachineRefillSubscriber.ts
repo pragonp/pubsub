@@ -13,6 +13,7 @@ export class MachineRefillSubscriber implements ISubscriber {
     handle(event: IEvent): void {
         if (event instanceof MachineRefillEvent) {
             const machine = this.machines.find((m) => m.id === event.machineId());
+
             if (machine) {
                 machine.stockLevel += event.getRefillQuantity();
                 console.log(`Machine ${machine.id} refilled. New stock: ${machine.stockLevel}`);
