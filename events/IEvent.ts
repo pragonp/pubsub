@@ -1,4 +1,4 @@
 export interface IEvent {
-    type(): string;
     machineId(): string;
+    type(): string;
 }
