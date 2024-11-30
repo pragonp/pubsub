@@ -22,11 +22,12 @@ export class MachineSaleSubscriber implements ISubscriber {
                 const soldQuantity = event.getSoldQuantity();
 
                 // We sell all we have by default
-                if (machine.stockLevel > 0 && soldQuantity > machine.stockLevel) {
+                if (machine.stockLevel > 0 && machine.stockLevel < soldQuantity) {
                     console.log(`>> Warning: Machine ${machine.id}: sell all current stock (${machine.stockLevel})`);
                     machine.stockLevel = 0;
-                } else if (machine.stockLevel < 0) {
+                } else if (machine.stockLevel - soldQuantity < 0) {
                     console.log(`>> Error: Machine ${machine.id} cannot process sale. Stock is 0.`);
+
                 } else {
                     machine.stockLevel -= soldQuantity;
                     console.log(`Machine ${machine.id} sold ${soldQuantity}. New stock: ${machine.stockLevel}`);
