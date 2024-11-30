@@ -1,14 +1,12 @@
 import { Machine } from './models/Machine';
 import { MachineSaleEvent } from './events/MachineSaleEvent';
 import { MachineRefillEvent } from './events/MachineRefillEvent';
-import { IPublishSubscribeService } from './services/IPublishSubscribeService';
 import { PublishSubscribeService } from './services/PublishSubscribeService';
 import { MachineSaleSubscriber } from './subscribers/MachineSaleSubscriber';
 import { MachineRefillSubscriber } from './subscribers/MachineRefillSubscriber';
 import { StockWarningSubscriber } from './subscribers/StockWarningSubscriber';
 import { IEvent } from './events/IEvent';
 
-// Helper functions
 const randomMachine = (): string => {
   const random = Math.random() * 3;
   if (random < 1) return '001';
@@ -18,11 +16,13 @@ const randomMachine = (): string => {
 
 const eventGenerator = (): IEvent => {
   const random = Math.random();
+
   if (random < 0.5) {
-    const saleQty = Math.random() < 0.5 ? 1 : 2; // 1 or 2
+    const saleQty = Math.random() < 0.5 ? 1 : 2;
     return new MachineSaleEvent(saleQty, randomMachine());
   }
-  const refillQty = Math.random() < 0.5 ? 3 : 5; // 3 or 5
+
+  const refillQty = Math.random() < 0.5 ? 3 : 5;
   return new MachineRefillEvent(refillQty, randomMachine());
 };
 
@@ -35,15 +35,20 @@ class App {
       new Machine('001'),
       new Machine('002'),
       new Machine('003'),
+      new Machine('004'),
+      new Machine('005'),
     ];
+
     this.pubSubService = new PublishSubscribeService();
+    console.log(`-------------------------------------------`);
   }
 
   private setupSubscribers(): void {
-    const saleSubscriber = new MachineSaleSubscriber(this.machines);
-    const refillSubscriber = new MachineRefillSubscriber(this.machines);
+    const saleSubscriber = new MachineSaleSubscriber(this.machines, this.pubSubService);
+    const refillSubscriber = new MachineRefillSubscriber(this.machines, this.pubSubService);
     const stockWarningSubscriber = new StockWarningSubscriber();
 
+    // Subscribing subscribers to events
     this.pubSubService.subscribe('sale', saleSubscriber);
     this.pubSubService.subscribe('refill', refillSubscriber);
     this.pubSubService.subscribe('lowStockWarning', stockWarningSubscriber);
@@ -51,7 +56,7 @@ class App {
   }
 
   private generateAndPublishEvents(): void {
-    const events = [1, 2, 3, 4, 5].map(() => eventGenerator());
+    const events = Array.from({ length: 20 }, () => eventGenerator());
     events.forEach((event) => this.pubSubService.publish(event));
   }
 

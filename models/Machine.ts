@@ -6,5 +6,6 @@ export class Machine {
 
     constructor(id: string) {
         this.id = id;
+        console.log(`Machine ${this.id} created with stock level: ${this.stockLevel}`);
     }
 }
